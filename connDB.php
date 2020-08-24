@@ -1,3 +1,9 @@
 <?php 
-    $conn = new PDO('mysql:host=localhost:8889;dbname=lab0819db;charset=utf8', 'root', 'root');
+    
+    try {
+        $conn = new PDO('mysql:host=localhost:3306;dbname=weather;charset=utf8', 'root', '');
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }catch(PDOException $e){
+        echo "Error: " . $e->getMessage();
+    }
 ?>

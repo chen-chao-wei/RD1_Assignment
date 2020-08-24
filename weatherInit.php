@@ -1,6 +1,7 @@
 <?php 
     include 'connDB.php';
-    $weatherJsonData = json_decode(file_get_contents('https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23'), true);
+    $token = "CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23";
+    $weatherJsonData = json_decode(file_get_contents('https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization='.$token), true);
     //print_r($data);
    try {
     // $locationName = $location['locationName'];
@@ -12,7 +13,7 @@
     // $CI = $location['weatherElement'][3]['time'][0]['parameter']['parameterName'];
        //("$locationName","$stime","$wx","$MinT","$MaxT","$PoP","$CI")
        //var_dump($location);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
        
         foreach($weatherJsonData['records']['location'] as $key => $item){
             $sqlStatement = <<<multi
@@ -40,7 +41,7 @@
    } catch (PDOException $e) {
         echo $sqlStatement . "<br>" . $e->getMessage();
    }
-    $conn = null;
+    $conn=null;
    echo ("<br>".count($weatherJsonData['records']['location'])."<br>");
     var_dump($weatherJsonData);
     
