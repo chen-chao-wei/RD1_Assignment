@@ -1,0 +1,46 @@
+### 可以考慮先做步驟 3,4 如果沒有php-zip錯誤訊息可能不用做 步驟1.2 ###
+
+1. install Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+過程中會提示你按enter繼續 or 其他按鍵離開 （建議enter 這個步驟會安裝很久. . .
+---
+2. install php-zip
+brew install php@7.3
+brew link php@7.3
+---
+3. install Composer
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === '8a6138e2a05a8c28539c9f0fb361159823655d7ad2deecb371b04a83966c61223adc522b0189079e3e9e277cd72b8897') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+安裝完後將composer.phar 檔案移動到/usr/local/bin/composer
+ sudo mv composer.phar /usr/local/bin/composer
+---
+4. 安裝lavavel
+composer global require laravel/installer
+設定全域路徑
+export PATH="$PATH:$HOME/.composer/vendor/bin"
+
+1. 學習態度
+2. 期待討論
+3. 9/8 dieline
+
+RD1_Assignment
+RD5_Assignment
+PID_Assignment
+RD1_Assignment 氣象查詢  -CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23
+https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23&locationName=%E5%AE%9C%E8%98%AD%E7%B8%A3&elementName=WeatherDescription
+1. 製作一個個人氣象網站，並且實作以下功能:
+1.1 縣市選擇:可自行選擇要查看的縣市
+1.2 顯示縣市當前天氣狀況
+1.3 顯示縣市未來2天、1週天氣預報
+1.4 顯示縣市各觀測站過去1小時、24小時累積雨量數據 
+1.5 切換縣市時，顯示該縣市的特色圖片
+2. 上述各式氣象資料，請一併儲存於資料庫
+3. 介面排版與所需素材請自由發揮
+後端call Api 存資料庫
+前端call 資料庫
+
+RD5_Assignment 網銀
+
+PID_Assignment 購物車
