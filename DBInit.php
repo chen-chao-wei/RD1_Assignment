@@ -40,12 +40,16 @@ function insertWeek(){
 
 
         $cnt = count($weekJsonData['records']['locations'][0]['location']);
+       
         //stime2,Wx2,minT2,maxT2,POP2,CI2,stime3,Wx3,minT3,maxT3,POP3,CI3
         for ($i = 0; $i < $cnt; $i++) {
             $location = $weekJsonData['records']['locations'][0]['location'][$i];
             $locationName = $location['locationName'];
             //echo $locationName;
-            
+            $sqlStatement = <<<multi
+            insert into week (locationName,stime,Wx,minT,maxT,POP,CI) 
+            values
+            multi;
 
 
             //$stime[] = $location['weatherElement'][0]['time'][0]['startTime'];
@@ -67,14 +71,15 @@ function insertWeek(){
                 $maxT[] = mb_substr($elementStrlen[2], 7, 2, "UTF-8");
                 $CI[]    = $elementStrlen[3];
                 
-                $sqlStatement = <<<multi
-                insert into week (locationName,stime,Wx,minT,maxT,POP,CI) 
-                values ('$locationName','{$stime[$j]}','{$Wx[$j]}','{$minT[$j]}','{$maxT[$j]}','{$POP[$j]}','{$CI[$j]}');        
-                multi;
+                $sqlStatement.="('$locationName','{$stime[$j]}','{$Wx[$j]}','{$minT[$j]}','{$maxT[$j]}','{$POP[$j]}','{$CI[$j]}'),";        
+                
                 //echo $sqlStatement."<br>";
-                $result = $conn->query($sqlStatement);
+                
             
             }
+            $sqlStatement = substr($sqlStatement,0,-1);
+            $sqlStatement.=";";
+            $result = $conn->query($sqlStatement);
             //mysql_query("select * from `sql_tab` where `name`='{$_POST["name"]}'");
             //stime2,Wx2,minT2,maxT2,POP2,CI2,stime3,Wx3,minT3,maxT3,POP3,CI3
             $Wx = $POP = $minT = $maxT = $CI = array();
@@ -100,24 +105,35 @@ function insertObsRain(){
         //var_dump($obsRainJdata);
 
         $cnt = count($obsRainJdata['records']['location']);
-        
-        
-        echo $locationName;
+        $sqlStatement = <<<multi
+            insert into obsrain (locationName,obsStationName,obsTime,HOUR_24,NOW) 
+            values 
+            multi;
+        //var_dump($obsRainJdata['records']['location']);
+        echo $cnt;
         for ($i = 0; $i < $cnt; $i++) {
             $location = $obsRainJdata['records']['location'][$i];
             $obsStationName = $location['locationName'];
             $locationName = $location['parameter'][0]['parameterValue'];
             $obsTime = $location['time']['obsTime'];
             $HOUR_24 = $location['weatherElement'][0]['elementValue'];
-            $NOW = $location['weatherElement'][1]['elementValue'];            
-            $sqlStatement = <<<multi
-            insert into obsrain (locationName,obsStationName,obsTime,HOUR_24,NOW) 
-            values ('$locationName','$obsStationName','$obsTime','$HOUR_24','$NOW');
-            multi;
-            $result = $conn->query($sqlStatement);
+            $NOW = $location['weatherElement'][1]['elementValue'];
+            ($HOUR_24<0)?$HOUR_24=0:$HOUR_24=$HOUR_24;
+            ($NOW<0)?$NOW=0:$NOW=$NOW;           
+            $sqlStatement .="('$locationName','$obsStationName','$obsTime','$HOUR_24','$NOW'),";
+           
             //echo $sqlStatement."<br>";
             
         }
+        $sqlStatement = substr($sqlStatement,0,-1);
+        $sqlStatement.=";";
+        echo $sqlStatement;
+        try {
+            $result = $conn->query($sqlStatement);
+        } catch (\Throwable $th) {
+            echo $th;
+        }
+       
         
     } catch (\Throwable $th) {
         //throw $th;
