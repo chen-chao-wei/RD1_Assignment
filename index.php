@@ -36,7 +36,7 @@ include_once 'connDB.php';
                 &nbsp;
             </div>
             <div class="col-sm-8">
-                <form name="weatherForm" action="getWeather.php?locationName=">>
+                <form name="weatherForm" action="county.php?locationName=">
                     <div class="form-group row">
                         <label for="select" class="h1 col-5 ">選擇縣市</label>
                         <div class="h3 col-8">

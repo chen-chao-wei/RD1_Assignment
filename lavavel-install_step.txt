@@ -30,6 +30,8 @@ RD5_Assignment
 PID_Assignment
 RD1_Assignment 氣象查詢  -CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23
 https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23&locationName=%E5%AE%9C%E8%98%AD%E7%B8%A3&elementName=WeatherDescription
+https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0002-001?Authorization=CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23&elementName=NOW&elementName=HOUR_24
+https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0002-001?Authorization=CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23&elementName=NOW&elementName=HOUR_24&parameterName=CITY
 1. 製作一個個人氣象網站，並且實作以下功能:
 1.1 縣市選擇:可自行選擇要查看的縣市
 1.2 顯示縣市當前天氣狀況
