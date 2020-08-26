@@ -79,11 +79,16 @@ try {
 }
 try {
     //----SELECT OBSRAIN TABLE START----//
+    // $sqlStatement = <<<multi
+    // SELECT locationName, obsStationName,SUM(HOUR_24)as HOUR_24,SUM(NOW)as NOW 
+    // FROM obsrain 
+    // GROUP BY `obsrain`.`locationName`
+    // ORDER BY `obsrain`.`locationName` DESC
+    // multi;
     $sqlStatement = <<<multi
-    SELECT locationName, SUM(HOUR_24)as HOUR_24,SUM(NOW)as NOW 
+    SELECT obsStationName,HOUR_24,NOW
     FROM obsrain 
-    GROUP BY `obsrain`.`locationName`
-    ORDER BY `obsrain`.`locationName` DESC
+    WHERE locationName="$city"
     multi;
     //echo $sqlStatement;
     $stmt = $conn->prepare($sqlStatement);
@@ -93,18 +98,21 @@ try {
     //var_dump($result);
     class CObsData
     {
-        var $locationName=array();
-        var $NOW=array();
-        var $HOUR_24=array();
+        var $locationName = array();
+        var $obsStationName = array();
+        var $NOW = array();
+        var $HOUR_24 = array();
     }
     $obsStation = new CObsData;
     //var_dump($result);
     foreach ($result as $key => $item) {
-        $obsStation->locationName[] = $item['locationName'];
+       // $obsStation->locationName[] = $item['locationName'];
+        $obsStation->obsStationName[] = $item['obsStationName'];
         $obsStation->NOW[] = $item['NOW'];
         $obsStation->HOUR_24[] = $item['HOUR_24'];
     }
-    //echo $obsStation->locationName[2]."+".$obsStation->NOW[2] . "+" . $obsStation->HOUR_24[2];
+  
+    //echo $obsStation->obsStationName[2]."+".$obsStation->NOW[2] . "+" . $obsStation->HOUR_24[2];
     //----SELECT OBSRAIN TABLE END----//
     //header("Location: index.php");
 } catch (\Throwable $th) {
@@ -139,8 +147,10 @@ try {
             <div class="col-sm-8">
                 <span></span>
                 <form name="weatherForm" action="county.php?locationName=">
-                    <div class="form-group row">
-                        <label for="select" class="h1 col-5 ">選擇縣市:<?= $city ?></label>
+
+                    <div id="background" class="form-group row div-background">
+
+                        <label for="select" class="title h1 col-5 "><?= $city ?></label>
                         <div class="h3 col-8">
                             <select id="myCID" name="locationName">
                                 <option value="" disabled="" selected="">選擇縣市</option>
@@ -183,7 +193,7 @@ try {
                                 <h3 class="card-title"><?= $week->stime[$i] ?></h5>
                                     <h4 id="Wx" class="card-title"><?= $week->Wx[$i] ?></h5>
                                         <h4 id="T" class="card-title"><?= "溫度攝氏" . $week->minT[$i] . "~" . $week->maxT[$i] . "°C" ?></h5>
-                                            <h4 id="POP" class="card-title"><?= "降雨機率:" . $week->POP[$i] ?></h5>
+                                            <h4 id="POP" class="card-title"><?= $week->POP[$i] ?></h5>
                                                 <h4 id="CI" class="card-title"><?= "舒適度:" . $week->CI[$i] ?></h5>
                                                     <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
                             </div>
@@ -244,13 +254,42 @@ try {
                     </table>
                     <div>
                         <h1>全台雨量觀測</h1>
-                        <span><a href="county.php?locationName=<?php echo $city."&flag=".$tableCount?>" class="btn-margins btn btn-info">
-                                <h3>今明兩天</h3>
+                        <span><a href="county.php?locationName=<?php echo $city . "&flag=" . $tableCount ?>" class="btn-margins btn btn-info">
+                                <h3>即時</h3>
                             </a></span>
-                            <span><a href="county.php?locationName=<?php echo $city."&flag=".$tableCount?>" class="btn-margins btn btn-info">
-                                <h3>未來一週</h3>
+                        <span><a href="county.php?locationName=<?php echo $city . "&flag=" . $tableCount ?>" class="btn-margins btn btn-info">
+                                <h3>24H</h3>
                             </a></span>
-                        <svg width="800px" height="600px" viewBox="0 0 800 600"></svg>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col">
+                                    <table class=" table table-striped">
+                                        <thead id="obsRain">
+                                            <tr>
+                                                <th scope="col"><?= $city?>觀測站</th>
+                                                <th scope="col">一小時內累積雨量</th>
+                                                <th scope="col">24小時累積雨量</th>
+                                            </tr>                         
+                                        </thead>
+                                        <tbody>
+                                        <?php
+                                            for ($i = 0; $i< count($obsStation->obsStationName); $i++) {
+                                                echo '<tr>';
+                                                echo '<td scope="rol">' . $obsStation->obsStationName[$i] . '</td>';
+                                                echo '<td >' . $obsStation->NOW[$i] . '</td>';
+                                                echo '<td >' . $obsStation->HOUR_24[$i] . '</td>';
+                                                echo '</tr>';
+                                            }
+                                            ?>             
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col">
+                                    <svg width="100%" height="100%" viewBox="0 0 800 600"></svg>
+                                </div>
+                            </div>
+                        </div>
+
 
                     </div> <!-- end of row -->
 
@@ -276,9 +315,7 @@ try {
                             d3.geo.mercator().center([121, 24]).scale(6000) // 座標變換函式
                         );
                         for (i = features.length - 1; i >= 0; i--) {
-                           
                             features[i].properties.density = i;
-                            console.log(features[i].properties.density);
                         }
                         var color = d3.scale.linear().domain([0, 100]).range(["#e9ecef", "#1870c7"]);
 
@@ -293,6 +330,14 @@ try {
                 <script type="text/javascript">
                     $(document).ready(function() {
 
+                        $("#background").css("width", '100%');
+                        $("#background").css("height", '300px');
+                        $("#background").css("background-image", 'url(http://localhost:8888/RD1_Assignment/images/citys/<?= $city ?>.jpg)');
+                        $("#background").css("background-attachment", 'scroll');
+                        $("#background").css("background-size", '800px 400px');
+                        $("#background").css("background-position", 'center');
+                        $("#background").css("background-repeat", 'no-repeat');
+
                     });
                     document.getElementById("myCID").onchange = function() {
                         var city = $("#myCID option:selected").text();
@@ -301,6 +346,8 @@ try {
                         //getWeather(city);
                     };
                 </script>
+
+
 </body>
 
 </html>

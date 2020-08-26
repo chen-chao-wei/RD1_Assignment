@@ -40,7 +40,7 @@ include_once 'connDB.php';
                 <script type="text/javascript" src="http://d3js.org/topojson.v1.min.js"></script>
                 <script>
                     window.addEventListener("click", function(event) {
-                        location.href='http://localhost/RD1_Assignment/county.php';
+                        location.href='http://localhost:8888/RD1_Assignment/county.php';
                     });
                     d3.json("./data/taiwan2.json", function(topodata) {
                         var features = topojson.feature(topodata, topodata.objects["COUNTY_MOI_1090727"]).features;

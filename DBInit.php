@@ -47,7 +47,7 @@ function insertWeek(){
             $locationName = $location['locationName'];
             //echo $locationName;
             $sqlStatement = <<<multi
-            insert into week (locationName,stime,Wx,minT,maxT,POP,CI) 
+            insert into week (id,locationName,stime,Wx,minT,maxT,POP,CI) 
             values
             multi;
 
@@ -56,6 +56,7 @@ function insertWeek(){
             //$stime2 = $location['weatherElement'][0]['time'][1]['startTime'];
             //$stime3 = $location['weatherElement'][0]['time'][2]['startTime'];
             for ($j = 0; $j < 14; $j++) {
+                $id = $j+($i*14);
                 $elementValue = $location['weatherElement'][0]['time'][$j]['elementValue'][0]['value'];
                 $elementStrlen = mb_split("。", $elementValue);
                 if (strpos($elementStrlen[1],'降雨機率') === false){                    
@@ -71,14 +72,15 @@ function insertWeek(){
                 $maxT[] = mb_substr($elementStrlen[2], 7, 2, "UTF-8");
                 $CI[]    = $elementStrlen[3];
                 
-                $sqlStatement.="('$locationName','{$stime[$j]}','{$Wx[$j]}','{$minT[$j]}','{$maxT[$j]}','{$POP[$j]}','{$CI[$j]}'),";        
+                $sqlStatement.="('$id','$locationName','{$stime[$j]}','{$Wx[$j]}','{$minT[$j]}','{$maxT[$j]}','{$POP[$j]}','{$CI[$j]}'),";        
                 
                 //echo $sqlStatement."<br>";
                 
             
             }
             $sqlStatement = substr($sqlStatement,0,-1);
-            $sqlStatement.=";";
+            $sqlStatement.="ON DUPLICATE KEY UPDATE stime=VALUES(stime),Wx=VALUES(Wx),minT=VALUES(minT),maxT=VALUES(maxT),POP=VALUES(POP),CI=VALUES(CI);";
+            //echo $sqlStatement;
             $result = $conn->query($sqlStatement);
             //mysql_query("select * from `sql_tab` where `name`='{$_POST["name"]}'");
             //stime2,Wx2,minT2,maxT2,POP2,CI2,stime3,Wx3,minT3,maxT3,POP3,CI3
@@ -92,7 +94,7 @@ function insertWeek(){
         //     multi;
         // }
     } catch (\Throwable $th) {
-        //throw $th;
+        throw $th;
     }
     $conn = null;
 }
@@ -106,28 +108,26 @@ function insertObsRain(){
 
         $cnt = count($obsRainJdata['records']['location']);
         $sqlStatement = <<<multi
-            insert into obsrain (locationName,obsStationName,obsTime,HOUR_24,NOW) 
+            insert into obsrain (id,locationName,obsStationName,obsTime,HOUR_24,NOW) 
             values 
             multi;
         //var_dump($obsRainJdata['records']['location']);
-        echo $cnt;
+        //echo $cnt;
         for ($i = 0; $i < $cnt; $i++) {
+            $id =$i;
             $location = $obsRainJdata['records']['location'][$i];
             $obsStationName = $location['locationName'];
             $locationName = $location['parameter'][0]['parameterValue'];
             $obsTime = $location['time']['obsTime'];
             $HOUR_24 = $location['weatherElement'][0]['elementValue'];
             $NOW = $location['weatherElement'][1]['elementValue'];
-            ($HOUR_24<0)?$HOUR_24=0:$HOUR_24=$HOUR_24;
-            ($NOW<0)?$NOW=0:$NOW=$NOW;           
-            $sqlStatement .="('$locationName','$obsStationName','$obsTime','$HOUR_24','$NOW'),";
-           
-            //echo $sqlStatement."<br>";
-            
+            ($HOUR_24<0)?$HOUR_24="0.00":$HOUR_24=$HOUR_24;
+            ($NOW<0)?$NOW="0.00":$NOW=$NOW;           
+            $sqlStatement .="('$id','$locationName','$obsStationName','$obsTime','$HOUR_24','$NOW'),";            
         }
         $sqlStatement = substr($sqlStatement,0,-1);
-        $sqlStatement.=";";
-        echo $sqlStatement;
+        $sqlStatement.="ON DUPLICATE KEY UPDATE obsTime=VALUES(obsTime),HOUR_24=VALUES(HOUR_24),NOW=VALUES(NOW);";
+        //echo $sqlStatement;
         try {
             $result = $conn->query($sqlStatement);
         } catch (\Throwable $th) {
@@ -136,9 +136,9 @@ function insertObsRain(){
        
         
     } catch (\Throwable $th) {
-        //throw $th;
+        throw $th;
     }
 }
 //insertToday();
-//insertWeek();
+insertWeek();
 insertObsRain();
