@@ -70,13 +70,8 @@ function insertWeek(){
                 $POP[]  = $elementStrlen[1];
                 $minT[]  = mb_substr($elementStrlen[2], 4, 2, "UTF-8");
                 $maxT[] = mb_substr($elementStrlen[2], 7, 2, "UTF-8");
-                $CI[]    = $elementStrlen[3];
-                
-                $sqlStatement.="('$id','$locationName','{$stime[$j]}','{$Wx[$j]}','{$minT[$j]}','{$maxT[$j]}','{$POP[$j]}','{$CI[$j]}'),";        
-                
-                //echo $sqlStatement."<br>";
-                
-            
+                $CI[]    = $elementStrlen[3];                
+                $sqlStatement.="('$id','$locationName','{$stime[$j]}','{$Wx[$j]}','{$minT[$j]}','{$maxT[$j]}','{$POP[$j]}','{$CI[$j]}'),";                        
             }
             $sqlStatement = substr($sqlStatement,0,-1);
             $sqlStatement.="ON DUPLICATE KEY UPDATE stime=VALUES(stime),Wx=VALUES(Wx),minT=VALUES(minT),maxT=VALUES(maxT),POP=VALUES(POP),CI=VALUES(CI);";
@@ -115,14 +110,16 @@ function insertObsRain(){
         //echo $cnt;
         for ($i = 0; $i < $cnt; $i++) {
             $id =$i;
-            $location = $obsRainJdata['records']['location'][$i];
+            $location       = $obsRainJdata['records']['location'][$i];
             $obsStationName = $location['locationName'];
-            $locationName = $location['parameter'][0]['parameterValue'];
-            $obsTime = $location['time']['obsTime'];
-            $HOUR_24 = $location['weatherElement'][0]['elementValue'];
-            $NOW = $location['weatherElement'][1]['elementValue'];
+            $locationName   = $location['parameter'][0]['parameterValue'];
+            $obsTime        = $location['time']['obsTime'];
+            $HOUR_24        = $location['weatherElement'][0]['elementValue'];
+            $NOW            = $location['weatherElement'][1]['elementValue'];
+
             ($HOUR_24<0)?$HOUR_24="0.00":$HOUR_24=$HOUR_24;
-            ($NOW<0)?$NOW="0.00":$NOW=$NOW;           
+            ($NOW<0)?$NOW="0.00":$NOW=$NOW;       
+
             $sqlStatement .="('$id','$locationName','$obsStationName','$obsTime','$HOUR_24','$NOW'),";            
         }
         $sqlStatement = substr($sqlStatement,0,-1);

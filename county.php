@@ -130,13 +130,13 @@ try {
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/jquery.toast.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 
 <body class="body-color">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
+    
 
     <div class="container">
 
@@ -253,7 +253,7 @@ try {
                         </tbody>
                     </table>
                     <div>
-                        <h1>全台雨量觀測</h1>
+                        <h1><?= $city?>雨量觀測</h1>
                         <span><a href="county.php?locationName=<?php echo $city . "&flag=" . $tableCount ?>" class="btn-margins btn btn-info">
                                 <h3>即時</h3>
                             </a></span>
@@ -266,7 +266,7 @@ try {
                                     <table class=" table table-striped">
                                         <thead id="obsRain">
                                             <tr>
-                                                <th scope="col"><?= $city?>觀測站</th>
+                                                <th scope="col">地方觀測站</th>
                                                 <th scope="col">一小時內累積雨量</th>
                                                 <th scope="col">24小時累積雨量</th>
                                             </tr>                         

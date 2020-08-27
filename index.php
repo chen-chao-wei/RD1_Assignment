@@ -20,14 +20,14 @@ include_once 'connDB.php';
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/jquery.toast.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
 
 </head>
 
 <body>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
+    
 
     <div class="container">
     <script src="js/jquery.js"></script>
@@ -39,9 +39,13 @@ include_once 'connDB.php';
                 <script src="https://unpkg.com/topojson@3"></script>
                 <script type="text/javascript" src="http://d3js.org/topojson.v1.min.js"></script>
                 <script>
+                    $(document).ready(function() {
+                        setTimeout(function(){ location.href='http://localhost:8888/RD1_Assignment/county.php'; }, 3000);
+                    });
                     window.addEventListener("click", function(event) {
                         location.href='http://localhost:8888/RD1_Assignment/county.php';
                     });
+                    
                     d3.json("./data/taiwan2.json", function(topodata) {
                         var features = topojson.feature(topodata, topodata.objects["COUNTY_MOI_1090727"]).features;
                         
