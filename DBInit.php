@@ -98,32 +98,33 @@ function insertObsRain(){
     try {
         include 'connDB.php';
         $token = "CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23";
-        $obsRainJdata  = json_decode(file_get_contents('https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0002-001?Authorization='.$token.'&elementName=NOW&elementName=HOUR_24&parameterName=CITY'), true);
+        $obsRainJdata  = json_decode(file_get_contents('https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0002-001?Authorization='.$token.'&elementName=RAIN&elementName=HOUR_24&parameterName=CITY'), true);
         //var_dump($obsRainJdata);
 
         $cnt = count($obsRainJdata['records']['location']);
         $sqlStatement = <<<multi
-            insert into obsrain (id,locationName,obsStationName,obsTime,HOUR_24,NOW) 
+            insert into obsrain (id,locationName,obsStationName,obsTime,HOUR_24,RAIN) 
             values 
             multi;
         //var_dump($obsRainJdata['records']['location']);
         //echo $cnt;
         for ($i = 0; $i < $cnt; $i++) {
-            $id =$i;
+            
             $location       = $obsRainJdata['records']['location'][$i];
+            $id             = $location['stationId'];
             $obsStationName = $location['locationName'];
             $locationName   = $location['parameter'][0]['parameterValue'];
             $obsTime        = $location['time']['obsTime'];
-            $HOUR_24        = $location['weatherElement'][0]['elementValue'];
-            $NOW            = $location['weatherElement'][1]['elementValue'];
+            $HOUR_24        = $location['weatherElement'][1]['elementValue'];
+            $RAIN           = $location['weatherElement'][0]['elementValue'];
 
             ($HOUR_24<0)?$HOUR_24="0.00":$HOUR_24=$HOUR_24;
-            ($NOW<0)?$NOW="0.00":$NOW=$NOW;       
+            ($RAIN<0)?$RAIN="0.00":$RAIN=$RAIN;       
 
-            $sqlStatement .="('$id','$locationName','$obsStationName','$obsTime','$HOUR_24','$NOW'),";            
+            $sqlStatement .="('$id','$locationName','$obsStationName','$obsTime','$HOUR_24','$RAIN'),";            
         }
         $sqlStatement = substr($sqlStatement,0,-1);
-        $sqlStatement.="ON DUPLICATE KEY UPDATE obsTime=VALUES(obsTime),HOUR_24=VALUES(HOUR_24),NOW=VALUES(NOW);";
+        $sqlStatement.="ON DUPLICATE KEY UPDATE obsTime=VALUES(obsTime),HOUR_24=VALUES(HOUR_24),RAIN=VALUES(RAIN);";
         //echo $sqlStatement;
         try {
             $result = $conn->query($sqlStatement);
@@ -139,3 +140,4 @@ function insertObsRain(){
 //insertToday();
 insertWeek();
 insertObsRain();
+

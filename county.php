@@ -3,7 +3,6 @@
 
 include_once 'connDB.php';
 
-
 if (isset($_GET['locationName'])) {
     $city = $_GET['locationName'];
 } else {
@@ -62,10 +61,12 @@ try {
     $result = $stmt->fetchAll();
     //var_dump($result[1]);
     $week = new CWeatherDescription();
-
+    $weekarray = array("日", "一", "二", "三", "四", "五", "六");
+    $dayOrNight = array("白天", "夜晚");
     foreach ($result as $key => $item) {
         $week->locationName[] = $item['locationName'];
-        $week->stime[] = $item['stime'];
+        (substr($item['stime'], 11, 2) == "06") ? $idx = 0 : $idx = 1;
+        $week->stime[] = substr($item['stime'], 5, 2) . "/" . substr($item['stime'], 8, 2) . "<p>" . "星期" . $weekarray[date("w", strtotime(substr($item['stime'], 0, 10)))] . "<p>" . $dayOrNight[$idx];
         $week->Wx[] = $item['Wx'];
         $week->POP[] = $item['POP'];
         $week->minT[] = $item['minT'];
@@ -79,14 +80,9 @@ try {
 }
 try {
     //----SELECT OBSRAIN TABLE START----//
-    // $sqlStatement = <<<multi
-    // SELECT locationName, obsStationName,SUM(HOUR_24)as HOUR_24,SUM(NOW)as NOW 
-    // FROM obsrain 
-    // GROUP BY `obsrain`.`locationName`
-    // ORDER BY `obsrain`.`locationName` DESC
-    // multi;
+
     $sqlStatement = <<<multi
-    SELECT obsStationName,HOUR_24,NOW
+    SELECT obsStationName,HOUR_24,RAIN
     FROM obsrain 
     WHERE locationName="$city"
     multi;
@@ -100,19 +96,19 @@ try {
     {
         var $locationName = array();
         var $obsStationName = array();
-        var $NOW = array();
+        var $RAIN = array();
         var $HOUR_24 = array();
     }
     $obsStation = new CObsData;
     //var_dump($result);
     foreach ($result as $key => $item) {
-       // $obsStation->locationName[] = $item['locationName'];
+        // $obsStation->locationName[] = $item['locationName'];
         $obsStation->obsStationName[] = $item['obsStationName'];
-        $obsStation->NOW[] = $item['NOW'];
+        $obsStation->RAIN[] = $item['RAIN'];
         $obsStation->HOUR_24[] = $item['HOUR_24'];
     }
-  
-    //echo $obsStation->obsStationName[2]."+".$obsStation->NOW[2] . "+" . $obsStation->HOUR_24[2];
+
+    //echo $obsStation->obsStationName[2]."+".$obsStation->RAIN[2] . "+" . $obsStation->HOUR_24[2];
     //----SELECT OBSRAIN TABLE END----//
     //header("Location: index.php");
 } catch (\Throwable $th) {
@@ -136,7 +132,7 @@ try {
 </head>
 
 <body class="body-color">
-    
+
 
     <div class="container">
 
@@ -146,11 +142,11 @@ try {
             </div>
             <div class="col-sm-8">
                 <span></span>
-                <form name="weatherForm" action="county.php?locationName=">
+                <form id="selectForm" name="weatherForm" action="county.php?locationName=">
 
                     <div id="background" class="form-group row div-background">
 
-                        <label for="select" class="title h1 col-5 "><?= $city ?></label>
+                        <label id="title" for="select" class=" h1 col-5 "><?= $city ?></label>
                         <div class="h3 col-8">
                             <select id="myCID" name="locationName">
                                 <option value="" disabled="" selected="">選擇縣市</option>
@@ -188,7 +184,7 @@ try {
 
                 <div id="showCard" class="row">
                     <?php for ($i = 0; $i < 3; $i++) { ?>
-                        <div id="card1" class="col card card-margins" style="width: 18rem;">
+                        <div id="card1" class="text-center col card card-margins" style="width: 18rem;">
                             <div class="card-body">
                                 <h3 class="card-title"><?= $week->stime[$i] ?></h5>
                                     <h4 id="Wx" class="card-title"><?= $week->Wx[$i] ?></h5>
@@ -207,13 +203,13 @@ try {
                     &nbsp;
                 </div>
                 <div>
-                    <table class=" table table-striped">
+                    <table class="text-center table table-striped">
                         <thead id="weekDate">
                             <tr>
                                 <h1>天氣預報</h1>
-                                <span><a href="county.php?locationName=<?php echo $city ?>&flag=3" class="btn-margins btn btn-info">
+                                <!-- <span><a href="county.php?locationName=<?php echo $city ?>&flag=3" class="btn-margins btn btn-info">
                                         <h3>今明兩天</h3>
-                                    </a></span>
+                                    </a></span> -->
                                 <span><a href="county.php?locationName=<?php echo $city ?>&flag=7" class="btn-margins btn btn-info">
                                         <h3>未來一週</h3>
                                     </a></span>
@@ -221,8 +217,12 @@ try {
 
                             <tr>
                                 <?php
+                                (count($week->stime) == 14) ? $x = [0, 2, 4, 6, 8, 10, 12] : $x = [0, 1, 3, 5, 7, 9, 11];
+
+                                //var_dump(($week));
                                 for ($i = 0; $i < $tableCount; $i++) {
-                                    echo '<th scope="col">' . $week->stime[$i] . '</th>';
+                                    //($i==0)?$x=$i:$x=$i*2;
+                                    echo '<th scope="col">' . substr($week->stime[$x[$i]], 0, 17) . '<p>' . '</th>';
                                 }
                                 ?>
                             </tr>
@@ -232,33 +232,31 @@ try {
 
                             <?php echo '<tr>';
                             for ($i = 0; $i < $tableCount; $i++) {
-                                echo '<th scope="col">' . $week->Wx[$i] . '</th>';
+                                echo '<th scope="col">' . $week->Wx[$x[$i]] . '</th>';
                             }
                             echo '</tr>';
                             echo '<tr>';
                             for ($i = 0; $i < $tableCount; $i++) {
-                                echo '<th scope="col">' . $week->POP[$i] . '</th>';
+                                echo '<th scope="col">' . $week->POP[$x[$i]] . '</th>';
                             }
                             echo '</tr>';
                             echo '<tr>';
                             for ($i = 0; $i < $tableCount; $i++) {
-                                echo '<th scope="col">' . '溫度攝氏' . $week->minT[$i] . "~" . $week->maxT[$i] . '°C</th>';
+                                echo '<th scope="col">' . '溫度攝氏' . $week->minT[$x[$i]] . "~" . $week->maxT[$i] . '°C</th>';
                             }
                             echo '</tr>';
                             echo '<tr>';
                             for ($i = 0; $i < $tableCount; $i++) {
-                                echo '<th scope="col">' . $week->CI[$i] . '</th>';
+                                echo '<th scope="col">' . $week->CI[$x[$i]] . '</th>';
                             }
                             echo '</tr>' ?>
                         </tbody>
                     </table>
                     <div>
-                        <h1><?= $city?>雨量觀測</h1>
+                        <h1><?= $city ?></h1>
+
                         <span><a href="county.php?locationName=<?php echo $city . "&flag=" . $tableCount ?>" class="btn-margins btn btn-info">
-                                <h3>即時</h3>
-                            </a></span>
-                        <span><a href="county.php?locationName=<?php echo $city . "&flag=" . $tableCount ?>" class="btn-margins btn btn-info">
-                                <h3>24H</h3>
+                                <h3>雨量觀測</h3>
                             </a></span>
                         <div class="container">
                             <div class="row">
@@ -269,18 +267,18 @@ try {
                                                 <th scope="col">地方觀測站</th>
                                                 <th scope="col">一小時內累積雨量</th>
                                                 <th scope="col">24小時累積雨量</th>
-                                            </tr>                         
+                                            </tr>
                                         </thead>
                                         <tbody>
-                                        <?php
-                                            for ($i = 0; $i< count($obsStation->obsStationName); $i++) {
+                                            <?php
+                                            for ($i = 0; $i < count($obsStation->obsStationName); $i++) {
                                                 echo '<tr>';
                                                 echo '<td scope="rol">' . $obsStation->obsStationName[$i] . '</td>';
-                                                echo '<td >' . $obsStation->NOW[$i] . '</td>';
+                                                echo '<td >' . $obsStation->RAIN[$i] . '</td>';
                                                 echo '<td >' . $obsStation->HOUR_24[$i] . '</td>';
                                                 echo '</tr>';
                                             }
-                                            ?>             
+                                            ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -302,7 +300,7 @@ try {
                 <script src="js/jquery.js"></script>
                 <script src="js/bootstrap.min.js"></script>
                 <script type="text/javascript" src="js/jquery.toast.js"></script>
-                <svg width="800px" height="600px" viewBox="0 0 800 600"></svg>
+
                 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js" charset="utf-8"></script>
                 <script src="https://unpkg.com/topojson@3"></script>
@@ -328,8 +326,18 @@ try {
                     });
                 </script>
                 <script type="text/javascript">
+                    // if ("geolocation" in navigator) {
+                    //     navigator.geolocation.getCurrentPosition(function(position) {
+                    //     console.log(position);})
+                    // } else {
+                    //     alert("很不幸！你的瀏覽器並不支援Geolocation API功能");
+                    // }
                     $(document).ready(function() {
-
+                        $("#myCID").children().each(function() {
+                            if ($(this).text() == '<?= $city ?>') {
+                                $(this).attr("selected", true);
+                            }
+                        });
                         $("#background").css("width", '100%');
                         $("#background").css("height", '300px');
                         $("#background").css("background-image", 'url(http://localhost:8888/RD1_Assignment/images/citys/<?= $city ?>.jpg)');
@@ -337,6 +345,13 @@ try {
                         $("#background").css("background-size", '800px 400px');
                         $("#background").css("background-position", 'center');
                         $("#background").css("background-repeat", 'no-repeat');
+                        $(function() {
+                            var tims = 1000 * 60 * 60 * 1; //設定延遲處理的時間，這裡設定的是1個小時
+                            setInterval(function() {
+                                $.get("DBinit.php");
+                            }, tims);
+                        });
+
 
                     });
                     document.getElementById("myCID").onchange = function() {
@@ -344,7 +359,16 @@ try {
                         $("#description").empty();
                         console.log(city);
                         //getWeather(city);
+
                     };
+                    $("#selectForm").submit(function() {
+                        try {
+                            $.get("DBinit.php");
+                            console.log("DBinit OK");
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    });
                 </script>
 
 
