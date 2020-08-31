@@ -21,5 +21,6 @@
   - select submit 時 透過ajax 更新 database
   - 字體位置調整
   整體畫面
-  ![image](https://github.com/weichen-chungyo/RD1_Assignment/blob/master/viewImage/0831.PNG)
+  ![image](https://github.com/weichen-chungyo/RD1_Assignment/blob/master/viewImage/0831.png)
+  
 ## TODO: D3.js 台灣地圖色階 對應 縣市雨量(雨量分布圖),要求地理資訊
