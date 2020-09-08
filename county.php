@@ -121,7 +121,7 @@ try {
 
 <head>
     <meta charset="UTF-8">
-    <title>Lab</title>
+    <title>首頁</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/jquery.toast.css" rel="stylesheet">
@@ -137,11 +137,13 @@ try {
     <div class="container">
 
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-md-2">
                 &nbsp;
             </div>
-            <div class="col-sm-8">
+            <div class="col-md-8 ">
                 <span></span>
+                <div class="row">
+                </div>
                 <form id="selectForm" name="weatherForm" action="county.php?locationName=">
 
                     <div id="background" class="form-group row div-background">
@@ -182,7 +184,7 @@ try {
 
                 </form>
 
-                <div id="showCard" class="row">
+                <div id="showCard" class="row ">
                     <?php for ($i = 0; $i < 3; $i++) { ?>
                         <div id="card1" class="text-center col card card-margins" style="width: 18rem;">
                             <div class="card-body">
@@ -197,7 +199,6 @@ try {
                             <span>&nbsp;</span>
                         </div>
                     <?php } ?>
-
                 </div>
                 <div>
                     &nbsp;
@@ -297,6 +298,10 @@ try {
                     &nbsp;
 
                 </div>
+            </div>
+            <div class="col-md-2">
+                &nbsp;
+            </div>
                 <!-- https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-D57649E3-5209-4DC3-A64E-ABCCB0B5AB23 -->
                 <script src="js/jquery.js"></script>
                 <script src="js/bootstrap.min.js"></script>
@@ -346,8 +351,7 @@ try {
                             if ($(this).text() == '<?= $city ?>') {
                                 $(this).attr("selected", true);
                             }
-                        });
-                        $("#background").css("width", '100%');
+                        });                        
                         $("#background").css("height", '300px');
                         $("#background").css("background-image", 'url(http://localhost:8888/RD1_Assignment/images/citys/<?= $city ?>.jpg)');
                         $("#background").css("background-attachment", 'scroll');

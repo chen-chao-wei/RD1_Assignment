@@ -16,7 +16,7 @@ include_once 'connDB.php';
 
 <head>
     <meta charset="UTF-8">
-    <title>Lab</title>
+    <title>welcome</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/jquery.toast.css">

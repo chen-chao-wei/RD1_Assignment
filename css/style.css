@@ -17,7 +17,8 @@
     color: white;
 }
 .card-margins{
-    margin-right:50px;
+    margin-left:0.625rem;
+    margin-right:0.625rem;
 }
 .btn-margins{
     margin-top:10px;
