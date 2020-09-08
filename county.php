@@ -260,7 +260,7 @@ try {
                             </a></span>
                         <div class="container">
                             <div class="row">
-                                <div class="col">
+                                <div class="col" style="height:300px;width:100%;overflow:auto;">
                                     <table class=" table table-striped">
                                         <thead id="obsRain">
                                             <tr>
@@ -282,7 +282,8 @@ try {
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="col">
+                                <div class="col ">
+                                    <h3 class="btn-info d-flex justify-content-center">全臺最近24小時雨量分佈</h3>
                                     <svg width="100%" height="100%" viewBox="0 0 800 600"></svg>
                                 </div>
                             </div>
@@ -306,24 +307,32 @@ try {
                 <script src="https://unpkg.com/topojson@3"></script>
                 <script type="text/javascript" src="http://d3js.org/topojson.v1.min.js"></script>
                 <script>
-                    d3.json("./data/taiwan2.json", function(topodata) {
-                        var features = topojson.feature(topodata, topodata.objects["COUNTY_MOI_1090727"]).features;
+                    $.get('Service.php', function(data) {
+                        HOUR_24Data = data.HOUR_24;
+                        console.log(HOUR_24Data);
+                        d3.json("./data/taiwan2.json", function(topodata) {
+                            var features = topojson.feature(topodata, topodata.objects["COUNTY_MOI_1090727"]).features;
+                            //console.log(features);
+                            for (i = features.length - 1; i >= 0; i--) {
+                                for (j = HOUR_24Data.length - 1; j >= 0; j--) {
+                                    if (HOUR_24Data[j][features[i].properties.COUNTYNAME] != undefined)
+                                        features[i].properties.density = HOUR_24Data[j][features[i].properties.COUNTYNAME];
+                                }
+                                //features[i].properties.density = i;
+                                //features[i].properties.density = HOUR_24Data[features[i].properties.COUNTYNAME];
+                                //console.log(features[i].properties.COUNTYNAME);
+                            }
+                            var path = d3.geo.path().projection(
+                                d3.geo.mercator().center([121, 24]).scale(6000) // 座標變換函式
+                            );
+                            var color = d3.scale.linear().domain([0, 100]).range(["#e9ecef", "#1870c7"]);
 
-                        var path = d3.geo.path().projection(
-                            d3.geo.mercator().center([121, 24]).scale(6000) // 座標變換函式
-                        );
-                        for (i = features.length - 1; i >= 0; i--) {
-                            features[i].properties.density = i;
-                        }
-                        var color = d3.scale.linear().domain([0, 100]).range(["#e9ecef", "#1870c7"]);
-
-                        d3.select("svg").selectAll("path").data(features)
-                            .enter().append("path").attr("d", path).style("fill", function(d) {
-                                return color(d.properties.density);
-                            });
-
-
-                    });
+                            d3.select("svg").selectAll("path").data(features)
+                                .enter().append("path").attr("d", path).style("fill", function(d) {
+                                    return color(d.properties.density);
+                                });
+                        });
+                    })
                 </script>
                 <script type="text/javascript">
                     // if ("geolocation" in navigator) {
