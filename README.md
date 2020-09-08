@@ -24,7 +24,7 @@
   ![image](https://github.com/weichen-chungyo/RD1_Assignment/blob/master/viewImage/0831.png)
   
 ## TODO: D3.js 台灣地圖色階 對應 縣市雨量(雨量分布圖),要求地理資訊
-## 0831
+## 0908
   - D3.js 台灣地圖色階 對應 縣市雨量(雨量分布圖)
   - UI調整
   雨量分布圖
